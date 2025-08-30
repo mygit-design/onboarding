@@ -1,0 +1,3846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAC Foods - HR Onboarding System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --primary-red-hover: #b91c1c;
+            --secondary-red: #ef4444;
+            --light-red: #fee2e2;
+            --dark-red: #991b1b;
+            --text-dark: #1f2937;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --border-light: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            
+            --text-xs: 11px;
+            --text-sm: 12px;
+            --text-base: 13px;
+            --text-lg: 14px;
+            --text-xl: 16px;
+            --text-2xl: 18px;
+            --text-3xl: 24px;
+            --text-4xl: 28px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            font-size: var(--text-base);
+            line-height: 1.5;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Welcome Screen Styles */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: grey;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: welcomeSlideOut 4s ease-in-out forwards;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .floating-emoji {
+            font-size: 4rem;
+            animation: float 2s ease-in-out infinite alternate;
+        }
+
+        .welcome-text {
+            color: white;
+            font-size: var(--text-3xl);
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(10px); }
+        }
+
+        @keyframes welcomeSlideOut {
+            0%, 70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+
+        /* Background Rotation */
+        .rotating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1s ease-in-out;
+            z-index: -1;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+        }
+
+        .company-logo {
+            font-size: var(--text-4xl);
+            font-weight: bold;
+            color: var(--primary-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: var(--text-base);
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: var(--text-base);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-red-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        /* Main Application Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        .app-header {
+            background: var(--bg-white);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-logo {
+            font-size: var(--text-2xl);
+            font-weight: bold;
+            color: var(--primary-red);
+        }
+
+        .user-welcome {
+            color: var(--text-medium);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-medium);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--light-red);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        /* Sidebar and Main Layout */
+        .app-content {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            color: var(--text-medium);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--light-red);
+            color: var(--primary-red);
+        }
+
+        .nav-link.active {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 16px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background: var(--bg-light);
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--bg-white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            font-size: var(--text-xl);
+            color: var(--primary-red);
+            margin-right: 0.75rem;
+        }
+
+        .card-title {
+            font-size: var(--text-lg);
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .card-value {
+            font-size: var(--text-3xl);
+            font-weight: bold;
+            color: var(--primary-red);
+        }
+
+        .card-description {
+            color: var(--text-light);
+            font-size: var(--text-sm);
+            margin-top: 0.5rem;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: var(--bg-white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: var(--text-2xl);
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-container {
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: var(--text-sm);
+            color: var(--text-medium);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-red), var(--secondary-red));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Video Section */
+        .video-container {
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .video-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+        }
+
+        .video-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-controls {
+            padding: 1rem 1.5rem;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-progress {
+            font-size: var(--text-sm);
+            color: var(--text-medium);
+        }
+
+        /* Company Overview Cards */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .flip-card-front {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+        }
+
+        .flip-card-back {
+            background: var(--primary-red);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-icon {
+            font-size: 2.5rem;
+            color: var(--primary-red);
+            margin-bottom: 1rem;
+        }
+
+        .flip-card-back .flip-card-icon {
+            color: white;
+        }
+
+        .flip-card-title {
+            font-size: var(--text-xl);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .flip-card-content {
+            font-size: var(--text-sm);
+            line-height: 1.6;
+        }
+
+        /* Departments Grid */
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .department-card {
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .department-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .department-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .department-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .department-icon {
+            font-size: var(--text-2xl);
+            color: var(--primary-red);
+            margin-right: 1rem;
+        }
+
+        .department-title {
+            font-size: var(--text-xl);
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-not-started {
+            background: var(--border-light);
+            color: var(--text-medium);
+        }
+
+        .status-in-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-question {
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-size: var(--text-lg);
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-red);
+            background: var(--light-red);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--primary-red);
+            background: var(--light-red);
+        }
+
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .app-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+                padding: 1rem;
+            }
+
+            .app-header {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+    display: none !important;
+}
+
+/* Feedback System Styles */
+.feedback-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.rating-section {
+    background: var(--bg-white);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    height: fit-content;
+}
+
+.rating-group {
+    margin-bottom: 2rem;
+}
+
+.rating-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.star-rating {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.star {
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.star:hover {
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.star.active {
+    color: #f59e0b;
+}
+
+.star.selected {
+    color: var(--primary-red);
+    animation: starPulse 0.3s ease-in-out;
+}
+
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.feedback-form {
+    background: var(--bg-white);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.feedback-form h3 {
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+.feedback-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+
+/* Admin Dashboard Styles */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-stat-card {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--primary-red);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--text-medium);
+    margin-top: 0.25rem;
+}
+
+.admin-section {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.section-header h3 {
+    color: var(--text-dark);
+    font-size: var(--text-xl);
+    margin: 0;
+}
+
+.admin-controls {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.admin-controls .btn {
+    font-size: var(--text-sm);
+    padding: 0.5rem 1rem;
+}
+
+.admin-table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.admin-table th {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    font-weight: 600;
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+    background: var(--light-red);
+}
+
+.progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-red) 0deg, var(--border-light) 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    font-size: var(--text-xs);
+    font-weight: bold;
+    position: relative;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-in-progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-inactive {
+    background: var(--border-light);
+    color: var(--text-medium);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: var(--text-xs);
+    transition: all 0.2s;
+}
+
+.action-btn.view {
+    background: var(--primary-red);
+    color: white;
+}
+
+.action-btn.reset {
+    background: #ef4444;
+    color: white;
+}
+
+.action-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.feedback-stats {
+    color: var(--text-medium);
+    font-size: var(--text-sm);
+}
+
+.star-display {
+    display: flex;
+    gap: 1px;
+    font-size: var(--text-sm);
+}
+
+.star-display .star {
+    color: #fbbf24;
+}
+
+.star-display .star.empty {
+    color: var(--border-light);
+}
+
+.comment-preview {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* Admin Modals */
+.admin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-modal-content {
+    background: var(--bg-white);
+    border-radius: 12px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.admin-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-modal-header h3 {
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-medium);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: var(--light-red);
+    color: var(--primary-red);
+}
+
+.admin-modal-body {
+    padding: 1.5rem;
+}
+
+.detail-section {
+    margin-bottom: 1.5rem;
+}
+
+.detail-section h4 {
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+    font-size: var(--text-lg);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    background: var(--bg-light);
+    padding: 0.75rem;
+    border-radius: 6px;
+}
+
+.detail-label {
+    font-size: var(--text-xs);
+    color: var(--text-medium);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.quiz-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.quiz-score-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: var(--bg-light);
+    border-radius: 4px;
+    font-size: var(--text-sm);
+}
+
+.feedback-detail-content {
+    line-height: 1.6;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .admin-stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .admin-controls {
+        justify-content: center;
+    }
+    
+    .admin-table-container {
+        font-size: var(--text-xs);
+    }
+    
+    .admin-modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="floating-emoji">👥</div>
+        <div class="welcome-text">Welcome to UAC Foods<br>HR Onboarding System</div>
+    </div>
+
+    <!-- Background rotation -->
+    <div id="rotatingBg" class="rotating-bg"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card" style="position: relative;">
+            <div class="login-header">
+                <div class="company-logo">UAC Foods</div>
+                <p>HR Onboarding System</p>
+<div style="position: absolute; top: 1rem; right: 1rem;">
+    <button onclick="showAdminLogin()" class="btn btn-secondary" style="font-size: var(--text-sm); padding: 0.5rem;">Admin</button>
+</div>                
+            </div>
+            
+            <div id="employeeLogin">
+                <form class="login-form" onsubmit="handleEmployeeLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="employeeName">Full Name</label>
+                        <input type="text" id="employeeName" class="form-input" required 
+                               placeholder="Enter your full name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Onboarding</button>
+                </form>
+            </div>
+
+            <div id="adminLogin" class="hidden">
+                <form class="login-form" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="adminUsername">Username</label>
+                        <input type="text" id="adminUsername" class="form-input" required>
+                    </div>
+<div style="text-align: center; margin-top: 1rem;">
+    <small style="color: var(--text-light); cursor: pointer;" onclick="toggleAdminAccess()">Administrator Access</small>
+</div>
+                    <div class="form-group">
+                        <label class="form-label" for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Admin Login</button>
+                </form>
+                <button onclick="showEmployeeLogin()" class="btn btn-secondary" style="margin-top: 1rem;">Back to Employee Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appContainer" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-logo">UAC Foods</div>
+                <div class="user-welcome" id="userWelcome"></div>
+            </div>
+            <div class="header-right">
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="app-content">
+            <!-- Employee Sidebar Navigation -->
+<nav class="sidebar" id="employeeSidebar">
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#company-overview" class="nav-link" onclick="showSection('company-overview')">
+                <i class="fas fa-building"></i> Company Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#departments" class="nav-link" onclick="showSection('departments')">
+                <i class="fas fa-sitemap"></i> Departments
+            </a>
+        </li>
+<li class="nav-item">
+    <a href="#feedback" class="nav-link" onclick="showSection('feedback')">
+        <i class="fas fa-comment-alt"></i> Feedback
+    </a>
+</li>
+    </ul>
+</nav>
+
+<!-- Admin Sidebar Navigation -->
+<nav class="sidebar hidden" id="adminSidebar">
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a href="#admin-dashboard" class="nav-link active" onclick="showSection('admin-dashboard')">
+                <i class="fas fa-cog"></i> Admin Dashboard
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+<!-- Admin Dashboard Content -->
+<div id="admin-dashboard" class="content-section hidden">
+    <h2 class="section-title">Admin Dashboard</h2>
+    
+    <!-- Analytics Cards -->
+    <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalUsersCount">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        
+        <div class="admin-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="activeUsersToday">0</div>
+                <div class="stat-label">Active Today</div>
+            </div>
+        </div>
+        
+        <div class="admin-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="completedOnboarding">0</div>
+                <div class="stat-label">Completed Onboarding</div>
+            </div>
+        </div>
+        
+        <div class="admin-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="averageRating">0.0</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Management Section -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3>User Management</h3>
+            <div class="admin-controls">
+                <button onclick="exportUserData()" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button onclick="refreshAdminData()" class="btn btn-primary">
+                    <i class="fas fa-refresh"></i> Refresh
+                </button>
+            </div>
+        </div>
+        
+        <div class="admin-table-container">
+            <table class="admin-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>First Login</th>
+                        <th>Last Login</th>
+                        <th>Progress</th>
+                        <th>Videos</th>
+                        <th>Quiz Avg</th>
+                        <th>Time Spent</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- User rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Feedback Analytics Section -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3>Feedback Analytics</h3>
+            <div class="feedback-stats">
+                <span class="feedback-count" id="feedbackCount">0 feedback submissions</span>
+            </div>
+        </div>
+        
+        <div class="admin-table-container">
+            <table class="admin-table" id="feedbackTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Overall Rating</th>
+                        <th>Content Rating</th>
+                        <th>Helpful Content</th>
+                        <th>Comments</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="feedbackTableBody">
+                    <!-- Feedback rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- User Detail Modal -->
+<div id="userDetailModal" class="admin-modal hidden">
+    <div class="admin-modal-content">
+        <div class="admin-modal-header">
+            <h3 id="userDetailTitle">User Details</h3>
+            <button onclick="closeUserDetailModal()" class="modal-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="admin-modal-body" id="userDetailBody">
+            <!-- User details will be populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Detail Modal -->
+<div id="feedbackDetailModal" class="admin-modal hidden">
+    <div class="admin-modal-content">
+        <div class="admin-modal-header">
+            <h3 id="feedbackDetailTitle">Feedback Details</h3>
+            <button onclick="closeFeedbackDetailModal()" class="modal-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="admin-modal-body" id="feedbackDetailBody">
+            <!-- Feedback details will be populated here -->
+        </div>
+    </div>
+</div>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="content-section">
+                    <h2 class="section-title">Dashboard</h2>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <i class="card-icon fas fa-percentage"></i>
+                                <h3 class="card-title">Overall Progress</h3>
+                            </div>
+                            <div class="card-value" id="overallProgress">0%</div>
+                            <p class="card-description">Completion percentage</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <i class="card-icon fas fa-play-circle"></i>
+                                <h3 class="card-title">Videos Watched</h3>
+                            </div>
+                            <div class="card-value" id="videosWatched">0/10</div>
+                            <p class="card-description">Training videos completed</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <i class="card-icon fas fa-trophy"></i>
+                                <h3 class="card-title">Quiz Average</h3>
+                            </div>
+                            <div class="card-value" id="quizAverage">0%</div>
+                            <p class="card-description">Average quiz score</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <i class="card-icon fas fa-clock"></i>
+                                <h3 class="card-title">Time Spent</h3>
+                            </div>
+                            <div class="card-value" id="timeSpent">0m</div>
+                            <p class="card-description">Total learning time</p>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <h3 class="section-title">Learning Progress</h3>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-label">
+                                <span>Company Overview</span>
+                                <span id="companyProgress">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="companyProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar-container">
+                            <div class="progress-label">
+                                <span>Department Training</span>
+                                <span id="departmentProgress">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="departmentProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Overview Section -->
+                <div id="company-overview" class="content-section hidden">
+                    <h2 class="section-title">Company Overview</h2>
+                    
+                    <!-- Company Video -->
+                    <div class="video-container">
+                        <div class="video-header">
+                            <h3>Welcome to UAC Foods</h3>
+                            <p>Learn about our company, mission, and values</p>
+                        </div>
+                        <div class="video-wrapper">
+<video id="companyVideo" class="video-iframe" controls preload="metadata">
+    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+    <p>Company Overview Video</p>
+</video>
+</div>
+
+
+<div class="video-controls">
+<button onclick="confirmVideoCompletion('company')" class="btn btn-primary" id="companyVideoConfirm" style="display: block;">
+        <i class="fas fa-check"></i> I have watched this video completely
+    </button>
+</div>
+                    </div>
+
+                    <!-- Company Info Cards -->
+                    <div class="overview-grid">
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <i class="flip-card-icon fas fa-bullseye"></i>
+                                    <h3 class="flip-card-title">Mission</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <i class="flip-card-icon fas fa-bullseye"></i>
+                                    <p class="flip-card-content">To solve the food expectations, needs and problems of the Nigerian consumer and deliver value to all stakeholders.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <i class="flip-card-icon fas fa-eye"></i>
+                                    <h3 class="flip-card-title">Vision</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <i class="flip-card-icon fas fa-eye"></i>
+                                    <p class="flip-card-content">We will continuously work towards ensuring that at least 80% of Nigerians will be served by us every day.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <i class="flip-card-icon fas fa-heart"></i>
+                                    <h3 class="flip-card-title">Values</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <i class="flip-card-icon fas fa-heart"></i>
+                                    <p class="flip-card-content">CRITIO: Customer Focus, Respect for Individual, Integrity, Team Spirit, Innovation, Openness & Communication</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <i class="flip-card-icon fas fa-utensils"></i>
+                                    <h3 class="flip-card-title">Products</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <i class="flip-card-icon fas fa-utensils"></i>
+                                    <p class="flip-card-content">Leading manufacturer and marketer of tasty, nourishing convenience foods that serve Nigerian consumers with nutritious, hygienic and safe products.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Quiz -->
+                    <div class="quiz-container">
+                        <h3>Knowledge Check</h3>
+                        <div class="quiz-question">
+                            <p class="question-text">What is UAC Foods' mission?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="selectQuizOption(this, false)">
+                                    To become the largest food company in Africa
+                                </div>
+                                <div class="quiz-option" onclick="selectQuizOption(this, true)">
+                                    To solve the food expectations, needs and problems of the Nigerian consumer and deliver value to all stakeholders
+                                </div>
+                                <div class="quiz-option" onclick="selectQuizOption(this, false)">
+                                    To export Nigerian food products worldwide
+                                </div>
+                                <div class="quiz-option" onclick="selectQuizOption(this, false)">
+                                    To revolutionize food technology in Nigeria
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Departments Section -->
+                <div id="departments" class="content-section hidden">
+                    <h2 class="section-title">Department Training</h2>
+                    
+                    <div class="departments-grid">
+                        <div class="department-card" onclick="openDepartment('human-resources')">
+                            <div class="department-header">
+                                <i class="department-icon fas fa-users"></i>
+                                <h3 class="department-title">Human Resources</h3>
+                            </div>
+                            <p>Learn about HR policies, procedures, and employee relations.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="hr-status">Not Started</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('manufacturing')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-industry"></i>
+                                <h3 class="department-title">Manufacturing</h3>
+                            </div>
+                            <p>Discover our production processes and quality standards.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="manufacturing-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('supply-chain')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-truck"></i>
+                                <h3 class="department-title">Supply Chain</h3>
+                            </div>
+                            <p>Understanding our logistics and distribution network.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="supply-chain-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('commercial')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-handshake"></i>
+                                <h3 class="department-title">Commercial</h3>
+                            </div>
+                            <p>Learn about our sales and marketing strategies.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="commercial-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('finance')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-calculator"></i>
+                                <h3 class="department-title">Finance</h3>
+                            </div>
+                            <p>Understanding financial processes and controls.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="finance-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('engineering')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-cogs"></i>
+                                <h3 class="department-title">Engineering</h3>
+                            </div>
+                            <p>Technical operations and maintenance procedures.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="engineering-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('corporate-affairs')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-building"></i>
+                                <h3 class="department-title">Corporate Affairs</h3>
+                            </div>
+                            <p>Corporate communications and public relations.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="corporate-affairs-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('risk-compliance')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-shield-alt"></i>
+                                <h3 class="department-title">Risk & Compliance</h3>
+                            </div>
+                            <p>Risk management and regulatory compliance.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="risk-compliance-status">Locked</span>
+                            </div>
+                        </div>
+
+                        <div class="department-card locked" onclick="openDepartment('it-business-technology')">
+                            <i class="lock-icon fas fa-lock"></i>
+                            <div class="department-header">
+                                <i class="department-icon fas fa-laptop"></i>
+                                <h3 class="department-title">IT / Business Technology</h3>
+                            </div>
+                            <p>Information technology and digital systems.</p>
+                            <div style="margin-top: 1rem;">
+                                <span class="status-badge status-not-started" id="it-business-technology-status">Locked</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- Feedback Section -->
+<div id="feedback" class="content-section hidden">
+    <h2 class="section-title">Share Your Feedback</h2>
+    
+    <div class="feedback-container">
+        <div class="rating-section">
+            <h3>Rate Your Experience</h3>
+            
+            <div class="rating-group">
+                <label>Overall Onboarding Experience:</label>
+                <div class="star-rating" data-rating="overall">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+            
+            <div class="rating-group">
+                <label>Content Quality:</label>
+                <div class="star-rating" data-rating="content">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feedback-form">
+            <h3>Tell Us More</h3>
+            <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                <div class="form-group">
+                    <label class="form-label" for="feedbackName">Name</label>
+                    <input type="text" id="feedbackName" class="form-input" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="feedbackEmail">Email (Optional)</label>
+                    <input type="email" id="feedbackEmail" class="form-input" placeholder="your.email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="helpfulContent">What content was most helpful?</label>
+                    <select id="helpfulContent" class="form-input">
+                        <option value="">Select...</option>
+                        <option value="company-overview">Company Overview</option>
+                        <option value="hr-training">HR Department Training</option>
+                        <option value="manufacturing">Manufacturing Training</option>
+                        <option value="supply-chain">Supply Chain Training</option>
+                        <option value="commercial">Commercial Training</option>
+                        <option value="finance">Finance Training</option>
+                        <option value="engineering">Engineering Training</option>
+                        <option value="corporate-affairs">Corporate Affairs Training</option>
+                        <option value="risk-compliance">Risk & Compliance Training</option>
+                        <option value="it-technology">IT/Technology Training</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="comments">Comments and Suggestions</label>
+                    <textarea id="comments" class="form-input" rows="4" 
+                              placeholder="Share your thoughts, suggestions, or any issues you encountered..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="improvements">What could we improve?</label>
+                    <textarea id="improvements" class="form-input" rows="3" 
+                              placeholder="Any suggestions for improvement..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</div>
+                <!-- Department Detail Modal -->
+                <div id="departmentModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+                    <div style="background: var(--bg-white); border-radius: 12px; max-width: 800px; width: 90%; max-height: 90%; overflow-y: auto; position: relative;">
+                        <div style="padding: 2rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                            <h2 id="modalDepartmentTitle">Department Training</h2>
+                            <button onclick="closeDepartmentModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-medium);">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div style="padding: 2rem;">
+                            <!-- Department Video -->
+                            <div class="video-container" style="margin-bottom: 2rem;">
+                                <div class="video-header">
+                                    <h3 id="modalVideoTitle">Department Introduction</h3>
+                                    <p>Learn about this department's role and responsibilities</p>
+                                </div>
+                                <div class="video-wrapper">
+<video id="departmentVideo" class="video-iframe" controls preload="metadata"
+       onloadedmetadata="initVideoTracking(this)"
+       ontimeupdate="updateVideoProgress(this)"
+       onended="onVideoComplete(this)">
+    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
+    <p>AI-generated video: Department Introduction</p>
+</video>
+
+</div>
+
+<div class="video-controls">
+    <button onclick="confirmDepartmentVideoCompletion()" class="btn btn-primary" id="deptVideoConfirm" style="display: none;">
+        <i class="fas fa-check"></i> I have watched this video completely
+    </button>
+</div>
+
+<!-- Department Quiz -->
+                <div class="quiz-container">
+                                <h3>Department Knowledge Check</h3>
+                                <div id="departmentQuizContent">
+                                    <!-- Quiz content will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+    <script>
+        
+// Global variables
+let currentUser = null;
+let isAdmin = false;
+let userData = {};
+let adminData = {
+    users: {},
+    feedback: []
+};
+
+
+// ==== COMPANY OVERVIEW TAB FUNCTIONS ====
+
+// Video tracking and completion functions
+function initVideoTracking(videoElement) {
+    if (!videoElement) return;
+    
+    // Prevent duplicate initialization
+    if (videoElement.hasAttribute('data-tracking-initialized')) return;
+    
+    videoElement.setAttribute('data-tracking-initialized', 'true');
+    videoElement.setAttribute('data-max-watched', '0');
+    
+    console.log('Video tracking initialized for:', videoElement.id);
+    
+    videoElement.addEventListener('loadedmetadata', function() {
+        console.log('Video metadata loaded, duration:', this.duration);
+    });
+    
+    videoElement.addEventListener('timeupdate', function() {
+        if (this.duration && this.duration > 0) {
+            const progress = (this.currentTime / this.duration) * 100;
+            const maxWatched = parseFloat(this.getAttribute('data-max-watched')) || 0;
+            
+            if (progress > maxWatched) {
+                this.setAttribute('data-max-watched', progress.toString());
+                console.log('Video progress updated:', progress.toFixed(2) + '%');
+                
+                // Show confirmation button when 80% watched
+                if (progress >= 80) {
+                    const confirmBtn = document.getElementById('companyVideoConfirm');
+                    if (confirmBtn && confirmBtn.style.display === 'none') {
+                        confirmBtn.style.display = 'block';
+                        confirmBtn.style.background = 'var(--primary-red)';
+                        confirmBtn.innerHTML = '<i class="fas fa-check"></i> Click to confirm completion';
+                        console.log('Confirmation button shown at 80% progress');
+                    }
+                }
+            }
+        }
+    });
+}
+
+function confirmVideoCompletion(type) {
+    if (!currentUser || isAdmin) return;
+    
+    if (type === 'company') {
+        const video = document.getElementById('companyVideo');
+        if (!video) {
+            console.error('Company video element not found');
+            return;
+        }
+        
+        const maxWatched = parseFloat(video.getAttribute('data-max-watched')) || 0;
+        console.log('Max watched percentage:', maxWatched);
+        
+        // More lenient check - 75% instead of 80%, or if video has ended
+        const hasWatchedEnough = maxWatched >= 75 || video.ended || 
+                                (video.currentTime > 0 && Math.abs(video.currentTime - video.duration) < 1);
+        
+        if (!hasWatchedEnough) {
+            alert(`Please watch more of the video. Current progress: ${maxWatched.toFixed(1)}%`);
+            return;
+        }
+        
+        // Mark company video as watched
+        if (!userData[currentUser].completedSections.includes('company-video-watched')) {
+            userData[currentUser].completedSections.push('company-video-watched');
+            userData[currentUser].videosWatched = (userData[currentUser].videosWatched || 0) + 1;
+            
+            // Update progress
+            userData[currentUser].progress.company = 50; // 50% for video, 50% for quiz
+            
+            // Enable quiz section
+            const quizContainer = document.querySelector('#company-overview .quiz-container');
+            if (quizContainer) {
+                quizContainer.style.opacity = '1';
+                quizContainer.style.pointerEvents = 'all';
+            }
+            
+            // Update confirmation button
+            const confirmBtn = document.getElementById('companyVideoConfirm');
+            if (confirmBtn) {
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed';
+                confirmBtn.style.background = '#10b981';
+                confirmBtn.disabled = true;
+            }
+            
+            showCompletionPopup('video', 'Video Completed!', 'You can now take the knowledge check quiz below.');
+            updateDashboard();
+            saveUserData();
+        }
+    }
+}
+
+function selectQuizOption(optionElement, isCorrect) {
+    if (!currentUser || isAdmin) return;
+    
+    // Check if video is completed first
+    if (!userData[currentUser].completedSections.includes('company-video-watched')) {
+        alert('Please complete the company overview video first.');
+        return;
+    }
+    
+    // Remove previous selections
+    const options = optionElement.parentElement.querySelectorAll('.quiz-option');
+    options.forEach(opt => {
+        opt.classList.remove('selected', 'correct', 'incorrect');
+        opt.style.pointerEvents = 'all';
+    });
+    
+    // Mark selected option
+    optionElement.classList.add('selected');
+    
+    setTimeout(() => {
+        if (isCorrect) {
+            optionElement.classList.add('correct');
+            handleCompanyQuizCompletion(true);
+        } else {
+            optionElement.classList.add('incorrect');
+            handleCompanyQuizCompletion(false);
+        }
+        
+        // Disable all options
+        options.forEach(opt => {
+            opt.style.pointerEvents = 'none';
+        });
+    }, 500);
+}
+
+function handleCompanyQuizCompletion(passed) {
+    if (!currentUser || isAdmin) return;
+    
+    const score = passed ? 100 : 0;
+    userData[currentUser].quizScores['company-overview'] = score;
+    
+    if (passed) {
+        if (!userData[currentUser].completedSections.includes('company-quiz-passed')) {
+            userData[currentUser].completedSections.push('company-quiz-passed');
+            userData[currentUser].progress.company = 100;
+            
+            // Calculate overall progress
+            calculateOverallProgress();
+            
+            // Unlock first department
+            unlockFirstDepartment();
+            
+            showCompletionPopup('success', 'Congratulations!', 
+                'You have completed the Company Overview. The HR department is now unlocked!');
+        }
+    } else {
+        showCompletionPopup('error', 'Incorrect Answer', 
+            'That\'s not quite right. You can retry the quiz after reviewing the content.');
+        
+        // Allow retry after 3 seconds
+        setTimeout(() => {
+            const options = document.querySelectorAll('#company-overview .quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+                opt.style.pointerEvents = 'all';
+            });
+        }, 3000);
+    }
+    
+    updateDashboard();
+    saveUserData();
+}
+
+// ==== DEPARTMENTS TAB FUNCTIONS ====
+
+// Department video sources
+const departmentVideoSources = {
+    'human-resources': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // 0:15  
+    'manufacturing': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', // 1:00
+    'supply-chain': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', // 0:15
+    'commercial': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', // 0:15
+    'finance': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', // 0:28
+    'engineering': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', // 0:20
+    'corporate-affairs': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', // 0:31
+    'risk-compliance': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4', // 3:48
+    'it-business-technology': 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' // 0:30
+};
+
+function updateDepartmentVideoSources() {
+    const departmentVideo = document.getElementById('departmentVideo');
+    if (departmentVideo && currentDepartment && departmentVideoSources[currentDepartment]) {
+        const source = departmentVideo.querySelector('source');
+        if (source) {
+            source.src = departmentVideoSources[currentDepartment];
+            departmentVideo.load();
+        }
+    }
+}
+
+function openDepartment(departmentId) {
+    if (!currentUser || isAdmin) return;
+    
+    // Check if department is unlocked
+    if (!isDepartmentUnlocked(departmentId)) {
+        alert('This department is locked. Please complete the previous requirements to unlock it.');
+        return;
+    }
+    
+    currentDepartment = departmentId;
+    
+    // Update modal content
+    const modal = document.getElementById('departmentModal');
+    const title = document.getElementById('modalDepartmentTitle');
+    const videoTitle = document.getElementById('modalVideoTitle');
+    
+    if (title) title.textContent = formatDepartmentName(departmentId);
+    if (videoTitle) videoTitle.textContent = `${formatDepartmentName(departmentId)} Training`;
+    
+    // Set up video source
+    updateDepartmentVideoSources();
+    
+    // Load department quiz
+    loadDepartmentQuiz(departmentId);
+    
+    // Show modal
+    if (modal) modal.classList.remove('hidden');
+    
+    // Initialize department video tracking after a short delay
+    setTimeout(() => {
+        const video = document.getElementById('departmentVideo');
+        if (video) {
+            initDepartmentVideoTracking(video);
+            
+            // Ensure the confirmation button is initially hidden but ready
+            const confirmBtn = document.getElementById('deptVideoConfirm');
+            if (confirmBtn) {
+                confirmBtn.style.display = 'none';
+                confirmBtn.disabled = false;
+            }
+        }
+    }, 200);
+}
+
+function initDepartmentVideoTracking(videoElement) {
+    if (!videoElement) return;
+    
+    // Prevent duplicate initialization
+    if (videoElement.hasAttribute('data-dept-tracking-initialized')) {
+        videoElement.removeAttribute('data-dept-tracking-initialized');
+    }
+    
+    videoElement.setAttribute('data-dept-tracking-initialized', 'true');
+    videoElement.setAttribute('data-max-watched', '0');
+    
+    console.log('Department video tracking initialized for:', videoElement.id);
+    
+    videoElement.addEventListener('loadedmetadata', function() {
+        console.log('Department video metadata loaded, duration:', this.duration);
+    });
+    
+    videoElement.addEventListener('timeupdate', function() {
+        if (this.duration && this.duration > 0) {
+            const progress = (this.currentTime / this.duration) * 100;
+            const maxWatched = parseFloat(this.getAttribute('data-max-watched')) || 0;
+            
+            if (progress > maxWatched) {
+                this.setAttribute('data-max-watched', progress.toString());
+                console.log('Department video progress:', progress.toFixed(2) + '%');
+                
+                // Show confirmation button when 80% watched
+                if (progress >= 80) {
+                    const confirmBtn = document.getElementById('deptVideoConfirm');
+                    if (confirmBtn && confirmBtn.style.display === 'none') {
+                        confirmBtn.style.display = 'block';
+                        confirmBtn.style.background = 'var(--primary-red)';
+                        confirmBtn.innerHTML = '<i class="fas fa-check"></i> I have watched this video completely';
+                        console.log('Department confirmation button shown at 80% progress');
+                    }
+                }
+            }
+        }
+    });
+}
+
+function closeDepartmentModal() {
+    const modal = document.getElementById('departmentModal');
+    if (modal) modal.classList.add('hidden');
+    
+    currentDepartment = '';
+    
+    // Reset video
+    const video = document.getElementById('departmentVideo');
+    if (video) {
+        video.pause();
+        video.currentTime = 0;
+    }
+}
+
+function isDepartmentUnlocked(departmentId) {
+    if (!currentUser || !userData[currentUser]) return false;
+    
+    // HR is unlocked after company overview completion
+    if (departmentId === 'human-resources') {
+        return userData[currentUser].completedSections.includes('company-quiz-passed');
+    }
+    
+    // Other departments unlock sequentially
+    const departmentOrder = [
+        'human-resources', 'manufacturing', 'supply-chain', 'commercial', 
+        'finance', 'engineering', 'corporate-affairs', 'risk-compliance', 'it-business-technology'
+    ];
+    
+    const currentIndex = departmentOrder.indexOf(departmentId);
+    if (currentIndex <= 0) return true; // HR or invalid department
+    
+    const previousDepartment = departmentOrder[currentIndex - 1];
+    return isDepartmentCompleted(previousDepartment);
+}
+
+function isDepartmentCompleted(departmentId) {
+    if (!currentUser || !userData[currentUser]) return false;
+    
+    const videoKey = `${departmentId}-video-watched`;
+    const quizKey = `${departmentId}-quiz-passed`;
+    
+    return userData[currentUser].completedSections.includes(videoKey) && 
+           userData[currentUser].completedSections.includes(quizKey);
+}
+
+function confirmDepartmentVideoCompletion() {
+    if (!currentUser || isAdmin || !currentDepartment) return;
+    
+    const video = document.getElementById('departmentVideo');
+    if (!video) {
+        console.error('Department video element not found');
+        return;
+    }
+    
+    const maxWatched = parseFloat(video.getAttribute('data-max-watched')) || 0;
+    console.log('Department max watched percentage:', maxWatched);
+    
+    // More lenient check - 75% instead of 80%, or if video has ended
+    const hasWatchedEnough = maxWatched >= 75 || video.ended || 
+                            (video.currentTime > 0 && Math.abs(video.currentTime - video.duration) < 1);
+    
+    if (!hasWatchedEnough) {
+        alert(`Please watch more of the video. Current progress: ${maxWatched.toFixed(1)}%`);
+        return;
+    }
+    
+    const videoKey = `${currentDepartment}-video-watched`;
+    
+    if (!userData[currentUser].completedSections.includes(videoKey)) {
+        userData[currentUser].completedSections.push(videoKey);
+        userData[currentUser].videosWatched = (userData[currentUser].videosWatched || 0) + 1;
+        
+        // Enable quiz section
+        // Enable quiz section
+        enableDepartmentQuiz();
+        
+        // Update confirmation button
+        const confirmBtn = document.getElementById('deptVideoConfirm');
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed';
+            confirmBtn.style.background = '#10b981';
+            confirmBtn.disabled = true;
+        }
+        
+        showCompletionPopup('video', 'Video Completed!', 'You can now take the department quiz below.');
+        updateDashboard();
+        saveUserData();
+    }
+}
+
+function loadDepartmentQuiz(departmentId) {
+    const quizContainer = document.getElementById('departmentQuizContent');
+    if (!quizContainer) return;
+    
+    const quizData = getDepartmentQuizData(departmentId);
+    
+    quizContainer.innerHTML = `
+        <div class="quiz-question">
+            <p class="question-text">${quizData.question}</p>
+            <div class="quiz-options">
+                ${quizData.options.map((option, index) => `
+                    <div class="quiz-option" onclick="selectDepartmentQuizOption(this, ${index === quizData.correctIndex})">
+                        ${option}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Check if video is completed and enable/disable quiz accordingly
+    const videoKey = `${departmentId}-video-watched`;
+    const isVideoCompleted = userData[currentUser] && userData[currentUser].completedSections.includes(videoKey);
+    
+    if (!isVideoCompleted) {
+        // Disable quiz if video not watched
+        quizContainer.style.opacity = '0.5';
+        quizContainer.style.pointerEvents = 'none';
+        
+        // Add a visual indicator
+        const existingMessage = quizContainer.querySelector('.quiz-disabled-message');
+        if (!existingMessage) {
+            const disabledMessage = document.createElement('div');
+            disabledMessage.className = 'quiz-disabled-message';
+            disabledMessage.innerHTML = '<p style="text-align: center; color: red; font-style: italic; margin: 10px 0;">Complete the video above to unlock the quiz</p>';
+            quizContainer.prepend(disabledMessage);
+        }
+    } else {
+        // Enable quiz if video is completed
+        enableDepartmentQuiz(quizContainer);
+    }
+}
+
+function enableDepartmentQuiz(quizContainer) {
+    if (!quizContainer) {
+        quizContainer = document.getElementById('departmentQuizContent');
+    }
+    
+    if (quizContainer) {
+        quizContainer.style.opacity = '1';
+        quizContainer.style.pointerEvents = 'all';
+        
+        // Remove the disabled message if it exists
+        const disabledMessage = quizContainer.querySelector('.quiz-disabled-message');
+        if (disabledMessage) {
+            disabledMessage.remove();
+        }
+        
+        console.log('Department quiz enabled');
+    }
+}
+
+
+function selectDepartmentQuizOption(optionElement, isCorrect) {
+    if (!currentUser || isAdmin || !currentDepartment) return;
+    
+    // Check if video is completed first
+    const videoKey = `${currentDepartment}-video-watched`;
+    if (!userData[currentUser].completedSections.includes(videoKey)) {
+        alert('Please complete the department video first.');
+        return;
+    }
+    
+    // Remove previous selections
+    const options = optionElement.parentElement.querySelectorAll('.quiz-option');
+    options.forEach(opt => {
+        opt.classList.remove('selected', 'correct', 'incorrect');
+        opt.style.pointerEvents = 'all';
+    });
+    
+    // Mark selected option
+    optionElement.classList.add('selected');
+    
+    setTimeout(() => {
+        if (isCorrect) {
+            optionElement.classList.add('correct');
+            handleDepartmentQuizCompletion(true);
+        } else {
+            optionElement.classList.add('incorrect');
+            handleDepartmentQuizCompletion(false);
+        }
+        
+        // Disable all options
+        options.forEach(opt => {
+            opt.style.pointerEvents = 'none';
+        });
+    }, 500);
+}
+
+function handleDepartmentQuizCompletion(passed) {
+    if (!currentUser || isAdmin || !currentDepartment) return;
+    
+    const score = passed ? 100 : 0;
+    userData[currentUser].quizScores[currentDepartment] = score;
+    
+    if (passed) {
+        const quizKey = `${currentDepartment}-quiz-passed`;
+        
+        if (!userData[currentUser].completedSections.includes(quizKey)) {
+            userData[currentUser].completedSections.push(quizKey);
+            
+            // Update department progress and unlock next
+            updateDepartmentProgress();
+            unlockNextDepartment(currentDepartment);
+            
+            showCompletionPopup('success', 'Department Completed!', 
+                `Congratulations! You have completed ${formatDepartmentName(currentDepartment)} training.`);
+        }
+    } else {
+        showCompletionPopup('error', 'Incorrect Answer', 
+            'That\'s not quite right. You can retry the quiz after reviewing the content.');
+        
+        // Allow retry after 3 seconds
+        setTimeout(() => {
+            const options = document.querySelectorAll('#departmentModal .quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+                opt.style.pointerEvents = 'all';
+            });
+        }, 3000);
+    }
+    
+    updateDashboard();
+    updateAllDepartmentStatuses();
+    saveUserData();
+}
+
+// ==== PROGRESS AND UNLOCKING FUNCTIONS ====
+
+function calculateOverallProgress() {
+    if (!currentUser || !userData[currentUser]) return;
+    
+    const user = userData[currentUser];
+    const companyProgress = user.progress.company || 0;
+    const departmentProgress = calculateDepartmentProgress();
+    
+    // 30% company overview, 70% departments
+    user.progress.departments = departmentProgress;
+    user.progress.overall = Math.round((companyProgress * 0.3) + (departmentProgress * 0.7));
+}
+
+function calculateDepartmentProgress() {
+    if (!currentUser || !userData[currentUser]) return 0;
+    
+    const departments = [
+        'human-resources', 'manufacturing', 'supply-chain', 'commercial',
+        'finance', 'engineering', 'corporate-affairs', 'risk-compliance', 'it-business-technology'
+    ];
+    
+    let completedCount = 0;
+    departments.forEach(dept => {
+        if (isDepartmentCompleted(dept)) {
+            completedCount++;
+        }
+    });
+    
+    return Math.round((completedCount / departments.length) * 100);
+}
+
+function unlockFirstDepartment() {
+    if (!currentUser || !userData[currentUser]) return;
+    
+    if (!userData[currentUser].unlockedDepartments) {
+        userData[currentUser].unlockedDepartments = [];
+    }
+    
+    if (!userData[currentUser].unlockedDepartments.includes('human-resources')) {
+        userData[currentUser].unlockedDepartments.push('human-resources');
+        updateAllDepartmentStatuses();
+    }
+}
+
+function unlockNextDepartment(currentDept) {
+    const departmentOrder = [
+        'human-resources', 'manufacturing', 'supply-chain', 'commercial',
+        'finance', 'engineering', 'corporate-affairs', 'risk-compliance', 'it-business-technology'
+    ];
+    
+    const currentIndex = departmentOrder.indexOf(currentDept);
+    if (currentIndex >= 0 && currentIndex < departmentOrder.length - 1) {
+        const nextDept = departmentOrder[currentIndex + 1];
+        
+        if (!userData[currentUser].unlockedDepartments) {
+            userData[currentUser].unlockedDepartments = [];
+        }
+        
+        if (!userData[currentUser].unlockedDepartments.includes(nextDept)) {
+            userData[currentUser].unlockedDepartments.push(nextDept);
+        }
+    }
+}
+
+function updateAllDepartmentStatuses() {
+    const departments = [
+        'human-resources', 'manufacturing', 'supply-chain', 'commercial',
+        'finance', 'engineering', 'corporate-affairs', 'risk-compliance', 'it-business-technology'
+    ];
+    
+    departments.forEach(dept => {
+        updateDepartmentStatus(dept);
+    });
+}
+
+function updateDepartmentStatus(departmentId) {
+    const statusElement = document.getElementById(`${departmentId}-status`);
+    const cardElement = document.querySelector(`[onclick*="${departmentId}"]`);
+    
+    if (!statusElement || !cardElement) return;
+    
+    let status = '';
+    let statusClass = '';
+    
+    if (!isDepartmentUnlocked(departmentId)) {
+        status = 'Locked';
+        statusClass = 'status-not-started';
+        cardElement.classList.add('locked');
+    } else if (isDepartmentCompleted(departmentId)) {
+        status = 'Completed';
+        statusClass = 'status-completed';
+        cardElement.classList.remove('locked');
+    } else {
+        status = 'Available';
+        statusClass = 'status-in-progress';
+        cardElement.classList.remove('locked');
+    }
+    
+    statusElement.textContent = status;
+    statusElement.className = `status-badge ${statusClass}`;
+}
+
+function updateDepartmentProgress() {
+    calculateOverallProgress();
+}
+
+// ==== QUIZ DATA ====
+
+function getDepartmentQuizData(departmentId) {
+    const quizDatabase = {
+        'human-resources': {
+            question: 'What is the primary role of the Human Resources department?',
+            options: [
+                'Managing financial budgets and expenses',
+                'Recruiting, training, and managing employees',
+                'Overseeing manufacturing processes',
+                'Handling customer complaints'
+            ],
+            correctIndex: 1
+        },
+        'manufacturing': {
+            question: 'What is the key focus of UAC Foods manufacturing department?',
+            options: [
+                'Quality control and production efficiency',
+                'Marketing and brand promotion',
+                'Financial planning and budgeting',
+                'Human resource management'
+            ],
+            correctIndex: 0
+        },
+        'supply-chain': {
+            question: 'What does the Supply Chain department primarily manage?',
+            options: [
+                'Employee training programs',
+                'Customer service operations',
+                'Logistics, procurement, and distribution',
+                'Financial auditing processes'
+            ],
+            correctIndex: 2
+        },
+        'commercial': {
+            question: 'What is the main responsibility of the Commercial department?',
+            options: [
+                'Managing IT systems and technology',
+                'Sales, marketing, and customer relationships',
+                'Manufacturing quality control',
+                'Legal compliance and risk management'
+            ],
+            correctIndex: 1
+        },
+        'finance': {
+            question: 'What does the Finance department oversee?',
+            options: [
+                'Product manufacturing and quality',
+                'Employee recruitment and training',
+                'Financial planning, budgeting, and reporting',
+                'Supply chain and logistics'
+            ],
+            correctIndex: 2
+        },
+        'engineering': {
+            question: 'What is the primary focus of the Engineering department?',
+            options: [
+                'Customer service and support',
+                'Technical operations and equipment maintenance',
+                'Marketing and sales strategies',
+                'Financial accounting and reporting'
+            ],
+            correctIndex: 1
+        },
+        'corporate-affairs': {
+            question: 'What does Corporate Affairs department handle?',
+            options: [
+                'Manufacturing processes and quality control',
+                'Public relations and corporate communications',
+                'Financial budgeting and expense management',
+                'Supply chain and procurement'
+            ],
+            correctIndex: 1
+        },
+        'risk-compliance': {
+            question: 'What is the main responsibility of Risk & Compliance?',
+            options: [
+                'Managing employee benefits and compensation',
+                'Overseeing manufacturing equipment',
+                'Risk management and regulatory compliance',
+                'Customer relationship management'
+            ],
+            correctIndex: 2
+        },
+        'it-business-technology': {
+            question: 'What does the IT/Business Technology department manage?',
+            options: [
+                'Human resources and employee relations',
+                'Information systems and digital technology',
+                'Manufacturing quality and production',
+                'Financial planning and analysis'
+            ],
+            correctIndex: 1
+        }
+    };
+    
+    return quizDatabase[departmentId] || {
+        question: 'What is this department\'s main function?',
+        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+        correctIndex: 0
+    };
+}
+
+// ==== ENHANCED UPDATE DASHBOARD FUNCTION ====
+
+function updateDashboard() {
+    if (!currentUser || isAdmin || !userData[currentUser]) return;
+    
+    const user = userData[currentUser];
+    
+    // Calculate current progress
+    calculateOverallProgress();
+    
+    // Update dashboard cards
+    document.getElementById('overallProgress').textContent = `${user.progress.overall || 0}%`;
+    document.getElementById('videosWatched').textContent = `${user.videosWatched || 0}/10`;
+    
+    // Calculate quiz average
+    const scores = Object.values(user.quizScores || {});
+    const average = scores.length > 0 
+        ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+        : 0;
+    document.getElementById('quizAverage').textContent = `${average}%`;
+    
+    // Update time spent
+    const totalTime = calculateCompletionTime();
+    document.getElementById('timeSpent').textContent = formatTime(totalTime);
+    
+    // Update progress bars
+    document.getElementById('companyProgress').textContent = `${user.progress.company || 0}%`;
+    document.getElementById('companyProgressBar').style.width = `${user.progress.company || 0}%`;
+    
+    document.getElementById('departmentProgress').textContent = `${user.progress.departments || 0}%`;
+    document.getElementById('departmentProgressBar').style.width = `${user.progress.departments || 0}%`;
+}
+
+// ==== POPUP SYSTEM ====
+
+function showCompletionPopup(type, title, message, callback) {
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        z-index: 10001; max-width: 400px; text-align: center; animation: popupSlideIn 0.3s ease-out;
+    `;
+    
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle';
+    
+    popup.innerHTML = `
+        <div style="color: ${bgColor}; font-size: 3rem; margin-bottom: 1rem;">
+            <i class="fas ${icon}"></i>
+        </div>
+        <h3 style="margin-bottom: 1rem; color: var(--text-dark);">${title}</h3>
+        <p style="color: var(--text-medium); margin-bottom: 1.5rem; line-height: 1.5;">${message}</p>
+        <button onclick="this.closest('div').remove(); ${callback ? callback : ''}" 
+                style="background: ${bgColor}; color: white; border: none; padding: 0.75rem 2rem; border-radius: 6px; cursor: pointer; font-weight: bold;">
+            Continue
+        </button>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    setTimeout(() => {
+        if (popup.parentElement) {
+            popup.remove();
+            if (callback) callback();
+        }
+    }, 5000);
+}
+
+// Add CSS for popup animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes popupSlideIn {
+        from { opacity: 0; transform: translate(-50%, -60%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+`;
+document.head.appendChild(style);
+
+
+
+// Feedback System Functions
+
+let feedbackRatings = {
+    overall: 0,
+    content: 0
+};
+
+// Initialize feedback system when page loads or user logs in
+function initializeFeedback() {
+    if (isAdmin) return; // Allow initialization even if no current user for display purposes
+    
+    // Auto-populate name field with logged-in user's name
+    const nameField = document.getElementById('feedbackName');
+    if (nameField && currentUser) {
+        nameField.value = currentUser;
+        nameField.readOnly = true;
+    }
+    
+    // Initialize star ratings functionality
+    initializeStarRatings();
+}
+
+// Initialize star rating functionality
+function initializeStarRatings() {
+    const starRatings = document.querySelectorAll('.star-rating');
+    
+    starRatings.forEach(rating => {
+        const ratingType = rating.dataset.rating;
+        if (!ratingType) return;
+        
+        const stars = rating.querySelectorAll('.star');
+        
+        stars.forEach((star, index) => {
+            // Remove existing listeners by cloning
+            const newStar = star.cloneNode(true);
+            star.parentNode.replaceChild(newStar, star);
+            
+            // Add new listeners
+            newStar.addEventListener('mouseenter', () => {
+                highlightStars(rating.querySelectorAll('.star'), index + 1);
+            });
+            
+            newStar.addEventListener('mouseleave', () => {
+                resetStars(rating.querySelectorAll('.star'), feedbackRatings[ratingType] || 0);
+            });
+            
+            newStar.addEventListener('click', () => {
+                selectRating(rating.querySelectorAll('.star'), index + 1, ratingType);
+            });
+        });
+    });
+}
+
+// Highlight stars on hover
+function highlightStars(stars, rating) {
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add('active');
+            star.classList.remove('selected');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+// Reset stars to current selection
+function resetStars(stars, currentRating) {
+    stars.forEach((star, index) => {
+        star.classList.remove('active');
+        if (index < currentRating) {
+            star.classList.add('selected');
+        } else {
+            star.classList.remove('selected');
+        }
+    });
+}
+
+// Select rating and update display
+function selectRating(stars, rating, type) {
+    // Update rating value
+    feedbackRatings[type] = rating;
+    
+    // Update visual display
+    stars.forEach((star, index) => {
+        star.classList.remove('active', 'selected');
+        if (index < rating) {
+            star.classList.add('selected');
+        }
+    });
+    
+    // Add pulse animation to selected stars
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.style.animation = 'starPulse 0.3s ease-in-out';
+            setTimeout(() => {
+                star.style.animation = '';
+            }, 300);
+        }
+    });
+    
+    console.log(`Rating updated: ${type} = ${rating}`); // Debug log
+}
+
+// Submit feedback form
+function submitFeedback(event) {
+    event.preventDefault();
+    
+    // Check if user is logged in and not admin
+    if (!currentUser || isAdmin) {
+        alert('Only logged-in users can submit feedback.');
+        return;
+    }
+    
+    // Validate that both ratings are provided
+    if (feedbackRatings.overall === 0) {
+        alert('Please provide a rating for your overall onboarding experience.');
+        return;
+    }
+    
+    if (feedbackRatings.content === 0) {
+        alert('Please provide a rating for content quality.');
+        return;
+    }
+    
+    // Get form data
+    const name = document.getElementById('feedbackName').value.trim();
+    const email = document.getElementById('feedbackEmail').value.trim();
+    const helpfulContent = document.getElementById('helpfulContent').value;
+    const comments = document.getElementById('comments').value.trim();
+    const improvements = document.getElementById('improvements').value.trim();
+    
+    // Validate required fields
+    if (!name) {
+        alert('Name is required.');
+        return;
+    }
+    
+    if (!comments) {
+        alert('Please provide some comments about your experience.');
+        return;
+    }
+    
+    // Validate email format if provided
+    if (email && !isValidEmail(email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
+    // Create feedback object
+    const feedbackData = {
+        id: Date.now().toString(), // Unique ID for feedback
+        name: name,
+        email: email || 'Not provided',
+        helpfulContent: helpfulContent || 'Not specified',
+        comments: comments,
+        improvements: improvements || 'None provided',
+        ratings: {
+            overall: feedbackRatings.overall,
+            content: feedbackRatings.content
+        },
+        timestamp: new Date().toISOString(),
+        userId: currentUser,
+        submittedAt: new Date().toLocaleString()
+    };
+    
+    // Initialize feedback array if it doesn't exist
+    if (!adminData.feedback) {
+        adminData.feedback = [];
+    }
+
+    // Add user data to admin data if it doesn't exist
+    if (!adminData.users[currentUser]) {
+        adminData.users[currentUser] = userData[currentUser];
+    }
+
+    // Save feedback
+    adminData.feedback.push(feedbackData);
+    saveAdminData();
+
+    console.log('Feedback saved to adminData:', adminData.feedback);
+
+    // Show success message
+    showCompletionPopup('success', 'Feedback Submitted!', 
+        'Thank you for your feedback. Your input helps us improve the onboarding experience.');
+
+    // Reset the form
+    resetFeedbackForm();
+}
+
+// Reset feedback form to initial state
+function resetFeedbackForm() {
+    // Reset form fields
+    document.getElementById('feedbackForm').reset();
+    
+    // Reset ratings
+    feedbackRatings = { overall: 0, content: 0 };
+    
+    // Reset all star visuals
+    resetAllStarRatings();
+    
+    // Re-populate name field
+    const nameField = document.getElementById('feedbackName');
+    if (nameField && currentUser) {
+        nameField.value = currentUser;
+    }
+}
+
+// Reset all star ratings visually
+function resetAllStarRatings() {
+    document.querySelectorAll('.star').forEach(star => {
+        star.classList.remove('active', 'selected');
+    });
+}
+
+// Call this when switching to feedback section
+function activateFeedbackSection() {
+    if (!currentUser || isAdmin) return;
+    
+    setTimeout(() => {
+        initializeFeedback();
+    }, 100);
+}
+
+// Email validation helper function
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Function to get feedback statistics (for admin dashboard)
+function getFeedbackStats() {
+    if (!adminData.feedback || adminData.feedback.length === 0) {
+        return {
+            totalFeedback: 0,
+            averageOverallRating: 0,
+            averageContentRating: 0,
+            mostHelpfulContent: 'N/A'
+        };
+    }
+    
+    const feedback = adminData.feedback;
+    const totalFeedback = feedback.length;
+    
+    // Calculate average ratings
+    const totalOverall = feedback.reduce((sum, f) => sum + f.ratings.overall, 0);
+    const totalContent = feedback.reduce((sum, f) => sum + f.ratings.content, 0);
+    
+    const averageOverallRating = (totalOverall / totalFeedback).toFixed(1);
+    const averageContentRating = (totalContent / totalFeedback).toFixed(1);
+    
+    // Find most helpful content
+    const contentCounts = {};
+    feedback.forEach(f => {
+        if (f.helpfulContent && f.helpfulContent !== 'Not specified') {
+            contentCounts[f.helpfulContent] = (contentCounts[f.helpfulContent] || 0) + 1;
+        }
+    });
+    
+    const mostHelpfulContent = Object.keys(contentCounts).length > 0 
+        ? Object.keys(contentCounts).reduce((a, b) => contentCounts[a] > contentCounts[b] ? a : b)
+        : 'N/A';
+    
+    return {
+        totalFeedback,
+        averageOverallRating,
+        averageContentRating,
+        mostHelpfulContent
+    };
+}
+
+// Auto-initialize feedback when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure other systems are loaded
+    setTimeout(() => {
+        if (document.getElementById('feedback')) {
+            initializeFeedback();
+        }
+    }, 100);
+});
+
+// Re-initialize when user logs in (call this from your login function)
+function onUserLogin() {
+    setTimeout(() => {
+        initializeFeedback();
+    }, 100);
+}
+
+
+// Background images for rotation
+const backgroundImages = [
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80',
+    'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80',
+    'https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+];
+
+let currentBgIndex = 0;
+let currentDepartment = '';
+let quizScores = {};
+let videoProgress = {};
+let startTime = Date.now();
+let sessionStorage = {}; // In-memory replacement for browser storage
+
+// Initialize application
+document.addEventListener('DOMContentLoaded', function() {
+    // Hide welcome screen after 4 seconds
+    setTimeout(() => {
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        if (welcomeScreen) {
+            welcomeScreen.classList.add('hidden');
+        }
+    }, 4000);
+
+    // Start background rotation
+    rotateBackground();
+    setInterval(rotateBackground, 5000);
+
+    // Load saved data
+    loadUserData();
+    loadAdminData();
+
+
+    // Initialize help system
+    setTimeout(initializeHelp, 1000);
+
+    // Initialize video sources
+    updateDepartmentVideoSources();
+});
+
+// Initialize company video tracking when company overview section is shown
+function initializeCompanyVideo() {
+    const companyVideo = document.getElementById('companyVideo');
+    if (companyVideo) {
+        initVideoTracking(companyVideo);
+        
+        // Also ensure the confirmation button is visible initially
+        const confirmBtn = document.getElementById('companyVideoConfirm');
+        if (confirmBtn) {
+            confirmBtn.style.display = 'block';
+        }
+    }
+}
+
+// Call this when showing company overview section
+function showSection(sectionId) {
+    // Hide all content sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    }
+
+    // Initialize feedback when showing feedback section
+if (sectionId === 'feedback') {
+    setTimeout(() => {
+        activateFeedbackSection();
+    }, 100);
+}
+    
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Find and activate current nav link
+    const currentLink = document.querySelector(`[onclick*="${sectionId}"]`);
+    if (currentLink) {
+        currentLink.classList.add('active');
+    }
+    
+    // Initialize video tracking for company overview
+    if (sectionId === 'company-overview') {
+        setTimeout(initializeCompanyVideo, 100);
+    }
+    
+    // Special handling for admin dashboard
+    if (sectionId === 'admin-dashboard') {
+        updateAdminDashboard();
+    }
+}
+
+// Background rotation
+function rotateBackground() {
+    const bgElement = document.getElementById('rotatingBg');
+    if (bgElement) {
+        bgElement.style.backgroundImage = `url('${backgroundImages[currentBgIndex]}')`;
+        currentBgIndex = (currentBgIndex + 1) % backgroundImages.length;
+    }
+}
+
+// Authentication functions
+function showAdminLogin() {
+    const employeeLogin = document.getElementById('employeeLogin');
+    const adminLogin = document.getElementById('adminLogin');
+    if (employeeLogin) employeeLogin.classList.add('hidden');
+    if (adminLogin) adminLogin.classList.remove('hidden');
+}
+
+function showEmployeeLogin() {
+    const adminLogin = document.getElementById('adminLogin');
+    const employeeLogin = document.getElementById('employeeLogin');
+    if (adminLogin) adminLogin.classList.add('hidden');
+    if (employeeLogin) employeeLogin.classList.remove('hidden');
+}
+
+function toggleAdminAccess() {
+    // Easter egg for admin access - auto-fill admin credentials
+    const username = document.getElementById('adminUsername');
+    const password = document.getElementById('adminPassword');
+    if (username && password) {
+        username.value = 'admin';
+        password.value = 'uac2024';
+    }
+}
+
+function handleEmployeeLogin(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('employeeName');
+    if (!nameInput) return;
+    
+    const name = nameInput.value.trim();
+    
+    if (name.length < 2) {
+        alert('Please enter a valid full name');
+        return;
+    }
+
+    currentUser = name;
+    isAdmin = false;
+    
+    // Initialize user data if new
+    if (!userData[currentUser]) {
+        userData[currentUser] = {
+            name: currentUser,
+            loginTime: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            progress: {
+                company: 0,
+                departments: 0,
+                overall: 0
+            },
+            videosWatched: 0,
+            quizScores: {},
+            timeSpent: 0,
+            completedSections: [],
+            unlockedDepartments: [],
+            interactions: []
+        };
+    } else {
+        userData[currentUser].lastLogin = new Date().toISOString();
+    }
+
+    saveUserData();
+    showApp();
+}
+
+function handleAdminLogin(event) {
+    event.preventDefault();
+    const usernameInput = document.getElementById('adminUsername');
+    const passwordInput = document.getElementById('adminPassword');
+    
+    if (!usernameInput || !passwordInput) {
+        console.error('Admin login form elements not found');
+        alert('Admin login form not found');
+        return;
+    }
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    console.log('Admin login attempt:', { username, password }); // Debug log
+    
+    // Fixed admin credentials check
+    if (username === 'admin' && password === 'uac2024') {
+        console.log('Admin credentials correct, logging in...'); // Debug log
+        currentUser = 'Administrator';
+        isAdmin = true;
+        showApp();
+        showSection('admin-dashboard');
+    } else {
+        console.error('Invalid admin credentials:', { username, password }); // Debug log
+        alert('Invalid admin credentials. Please check username and password.');
+        usernameInput.value = '';
+        passwordInput.value = '';
+    }
+}
+
+function showApp() {
+    const loginScreen = document.getElementById('loginScreen');
+    const appContainer = document.getElementById('appContainer');
+    const userWelcome = document.getElementById('userWelcome');
+    const employeeSidebar = document.getElementById('employeeSidebar');
+    const adminSidebar = document.getElementById('adminSidebar');
+    
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (appContainer) appContainer.classList.add('active');
+    
+    // Update welcome message
+    if (userWelcome) {
+        userWelcome.textContent = `Welcome, ${currentUser}${isAdmin ? ' (Administrator)' : ''}`;
+    }
+    
+    // Show appropriate sidebar and default section
+    // In your existing showApp() function, replace the admin section with:
+
+   if (isAdmin) {
+    if (employeeSidebar) employeeSidebar.classList.add('hidden');
+    if (adminSidebar) adminSidebar.classList.remove('hidden');
+    showSection('admin-dashboard');
+    
+    // Load and display admin data
+    setTimeout(() => {
+        updateAdminDashboard();
+    }, 100);
+} else {
+    if (adminSidebar) adminSidebar.classList.add('hidden');
+    if (employeeSidebar) employeeSidebar.classList.remove('hidden');
+    showSection('dashboard');
+    
+    // Initialize feedback for regular users
+    setTimeout(() => {
+        initializeFeedback();
+    }, 200);
+    
+    // Start time tracking and other user functions...
+        
+        // Start time tracking for regular users
+        startTime = Date.now();
+        updateDashboard();
+        updateAllDepartmentStatuses();
+        
+        // Update admin data
+        if (!adminData.users[currentUser]) {
+            adminData.users[currentUser] = userData[currentUser];
+        } else {
+            adminData.users[currentUser] = { ...adminData.users[currentUser], ...userData[currentUser] };
+        }
+        saveAdminData();
+    }
+}
+
+function logout() {
+    // Save time spent for regular users
+    if (!isAdmin && currentUser && userData[currentUser]) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 60000); // minutes
+        userData[currentUser].timeSpent += timeSpent;
+        saveUserData();
+        
+        // Update admin data
+        if (adminData.users[currentUser]) {
+            adminData.users[currentUser] = userData[currentUser];
+            saveAdminData();
+        }
+    }
+
+    // Reset state
+    currentUser = null;
+    isAdmin = false;
+    
+    // Reset UI
+    const appContainer = document.getElementById('appContainer');
+    const loginScreen = document.getElementById('loginScreen');
+    
+    if (appContainer) appContainer.classList.remove('active');
+    if (loginScreen) loginScreen.style.display = 'flex';
+    
+    // Clear forms
+    const employeeName = document.getElementById('employeeName');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminPassword = document.getElementById('adminPassword');
+    
+    if (employeeName) employeeName.value = '';
+    if (adminUsername) adminUsername.value = '';
+    if (adminPassword) adminPassword.value = '';
+    
+    // Show employee login by default
+    showEmployeeLogin();
+    
+    // Reset navigation
+    showSection('dashboard');
+}
+
+// Navigation functions
+function showSection(sectionId) {
+    // Hide all content sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    }
+    
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Find and activate current nav link
+    const currentLink = document.querySelector(`[onclick*="${sectionId}"]`);
+    if (currentLink) {
+        currentLink.classList.add('active');
+    }
+    
+    // Special handling for admin dashboard
+    if (sectionId === 'admin-dashboard') {
+        updateAdminDashboard();
+    }
+
+}
+
+
+
+
+// Fixed Data persistence functions - using in-memory storage
+function saveUserData() {
+    try {
+        // Store in our session storage object instead of localStorage
+        sessionStorage.userData = JSON.stringify(userData);
+        console.log('User data saved to session:', userData);
+        
+        // Also update admin data
+        if (currentUser && userData[currentUser] && !isAdmin) {
+            adminData.users[currentUser] = { ...userData[currentUser] };
+            saveAdminData();
+        }
+    } catch (error) {
+        console.error('Error saving user data:', error);
+    }
+}
+
+function loadUserData() {
+    try {
+        if (sessionStorage.userData) {
+            userData = JSON.parse(sessionStorage.userData);
+        } else {
+            userData = {};
+        }
+        console.log('User data loaded from session:', userData);
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        userData = {};
+    }
+}
+
+function saveAdminData() {
+    try {
+        sessionStorage.adminData = JSON.stringify(adminData);
+        console.log('Admin data saved to session:', adminData);
+    } catch (error) {
+        console.error('Error saving admin data:', error);
+    }
+}
+
+function loadAdminData() {
+    try {
+        if (sessionStorage.adminData) {
+            adminData = JSON.parse(sessionStorage.adminData);
+        } else {
+            adminData = { users: {}, feedback: [] };
+        }
+        
+        if (!adminData.users) adminData.users = {};
+        if (!adminData.feedback) adminData.feedback = [];
+        
+        console.log('Admin data loaded from session:', adminData);
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        adminData = { users: {}, feedback: [] };
+    }
+}
+
+// Utility functions
+function formatTime(minutes) {
+    if (!minutes || minutes < 60) {
+        return `${minutes || 0}m`;
+    } else {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return `${hours}h ${remainingMinutes}m`;
+    }
+}
+
+function calculateCompletionTime() {
+    if (!currentUser || !userData[currentUser]) return 0;
+    
+    const user = userData[currentUser];
+    const currentSession = Math.floor((Date.now() - startTime) / 60000);
+    return (user.timeSpent || 0) + currentSession;
+}
+
+function trackVideoProgress(videoId, progress) {
+    if (!currentUser || isAdmin) return;
+    
+    if (!videoProgress[currentUser]) {
+        videoProgress[currentUser] = {};
+    }
+    
+    videoProgress[currentUser][videoId] = Math.max(
+        videoProgress[currentUser][videoId] || 0,
+        progress
+    );
+    
+    if (progress >= 80 && !userData[currentUser].completedSections.includes(`${videoId}-watched`)) {
+        userData[currentUser].completedSections.push(`${videoId}-watched`);
+        userData[currentUser].videosWatched += 1;
+        updateDashboard();
+    }
+}
+
+// Enhanced admin functions
+function exportUserData() {
+    if (!isAdmin) return;
+    
+    const exportData = {
+        users: adminData.users,
+        feedback: adminData.feedback,
+        exportDate: new Date().toISOString(),
+        totalUsers: Object.keys(adminData.users).length
+    };
+    
+    console.log('Export data:', exportData);
+    alert('User data exported successfully! Check console for data.');
+}
+
+function resetUserProgress(userName) {
+    if (!isAdmin) return;
+    
+    if (confirm(`Are you sure you want to reset ${userName}'s progress? This action cannot be undone.`)) {
+        if (adminData.users[userName]) {
+            adminData.users[userName].progress = { company: 0, departments: 0, overall: 0 };
+            adminData.users[userName].quizScores = {};
+            adminData.users[userName].videosWatched = 0;
+            adminData.users[userName].completedSections = [];
+            adminData.users[userName].unlockedDepartments = [];
+            adminData.users[userName].timeSpent = 0;
+            
+            saveAdminData();
+            updateAdminDashboard();
+            alert(`${userName}'s progress has been reset.`);
+        }
+    }
+}
+
+// Error handling
+function handleError(error, context) {
+    console.error(`Error in ${context}:`, error);
+    
+    const errorMessage = document.createElement('div');
+    errorMessage.style.cssText = `
+        position: fixed; top: 20px; right: 20px; background: #ef4444;
+        color: white; padding: 1rem; border-radius: 6px; z-index: 9999;
+        max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    errorMessage.innerHTML = `
+        <strong>Error:</strong> Something went wrong. Please try again.
+        <button onclick="this.parentElement.remove()" 
+                style="background: none; border: none; color: white; float: right; cursor: pointer;">×</button>
+    `;
+    
+    document.body.appendChild(errorMessage);
+    
+    setTimeout(() => {
+        if (errorMessage.parentElement) {
+            errorMessage.remove();
+        }
+    }, 5000);
+}
+
+function initializeHelp() {
+    const helpTexts = {
+        'dashboard': 'Track your learning progress and see your achievements',
+        'company-overview': 'Learn about UAC Foods mission, vision, and values',
+        'departments': 'Complete training for each department to unlock the next',
+        'feedback': 'Share your experience to help us improve the onboarding process'
+    };
+    
+    document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && helpTexts[href.substring(1)]) {
+            link.title = helpTexts[href.substring(1)];
+        }
+    });
+}
+
+// Auto-save functionality with improved error handling
+setInterval(() => {
+    if (currentUser && !isAdmin && userData[currentUser]) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 60000);
+        const totalTime = (userData[currentUser].timeSpent || 0) + timeSpent;
+        
+        const timeSpentElement = document.getElementById('timeSpent');
+        if (timeSpentElement) {
+            timeSpentElement.textContent = formatTime(totalTime);
+        }
+        
+        if (adminData.users[currentUser]) {
+            adminData.users[currentUser] = { ...userData[currentUser] };
+            adminData.users[currentUser].timeSpent = totalTime;
+        }
+        
+        saveUserData();
+        saveAdminData();
+    }
+}, 30000); // Save every 30 seconds
+
+// Enhanced event listeners
+window.addEventListener('beforeunload', function(e) {
+    if (currentUser && !isAdmin && userData[currentUser]) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 60000);
+        userData[currentUser].timeSpent = (userData[currentUser].timeSpent || 0) + timeSpent;
+        saveUserData();
+    }
+});
+
+
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    if (isAdmin) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'e':
+                    e.preventDefault();
+                    exportUserData();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    updateAdminDashboard();
+                    break;
+            }
+        }
+    }
+    
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('departmentModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            closeDepartmentModal();
+        }
+    }
+});
+
+// Initialize tooltips and mobile support
+function initializeTooltips() {
+    const tooltipElements = document.querySelectorAll('[data-tooltip]');
+    tooltipElements.forEach(element => {
+        element.addEventListener('mouseenter', showTooltip);
+        element.addEventListener('mouseleave', hideTooltip);
+    });
+}
+
+function showTooltip(event) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = event.target.getAttribute('data-tooltip');
+    tooltip.style.cssText = `
+        position: absolute;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        z-index: 1000;
+        white-space: nowrap;
+        pointer-events: none;
+    `;
+    
+    document.body.appendChild(tooltip);
+    
+    const rect = event.target.getBoundingClientRect();
+    tooltip.style.left = rect.left + 'px';
+    tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
+    
+    event.target.tooltipElement = tooltip;
+}
+
+function hideTooltip(event) {
+    if (event.target.tooltipElement) {
+        event.target.tooltipElement.remove();
+        event.target.tooltipElement = null;
+    }
+}
+
+// Final initialization
+console.log('UAC Foods HR Onboarding System - Fixed JavaScript fully loaded and initialized');
+
+
+// Admin Dashboard Functions
+function updateAdminDashboard() {
+    if (!isAdmin) return;
+    
+    try {
+        // Calculate statistics
+        const users = adminData.users || {};
+        const feedback = adminData.feedback || [];
+        const userArray = Object.values(users);
+        
+        // Total users
+        document.getElementById('totalUsersCount').textContent = userArray.length;
+        
+        // Active users today
+        const today = new Date().toDateString();
+        const activeToday = userArray.filter(user => 
+            user.lastLogin && new Date(user.lastLogin).toDateString() === today
+        ).length;
+        document.getElementById('activeUsersToday').textContent = activeToday;
+        
+        // Completed onboarding (progress >= 90%)
+        const completed = userArray.filter(user => 
+            user.progress && user.progress.overall >= 90
+        ).length;
+        document.getElementById('completedOnboarding').textContent = completed;
+        
+        // Average rating
+        const ratings = feedback.filter(f => f.ratings && f.ratings.overall);
+        const avgRating = ratings.length > 0 
+            ? (ratings.reduce((sum, f) => sum + f.ratings.overall, 0) / ratings.length).toFixed(1)
+            : '0.0';
+        document.getElementById('averageRating').textContent = avgRating;
+        
+        // Update tables
+        updateUsersTable();
+        updateFeedbackTable();
+        
+    } catch (error) {
+        console.error('Error updating admin dashboard:', error);
+    }
+}
+
+function updateUsersTable() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    
+    const users = adminData.users || {};
+    const userArray = Object.entries(users);
+    
+    tbody.innerHTML = userArray.map(([name, user]) => {
+        const progress = user.progress ? user.progress.overall || 0 : 0;
+        const quizScores = user.quizScores ? Object.values(user.quizScores) : [];
+        const avgQuiz = quizScores.length > 0 
+            ? Math.round(quizScores.reduce((sum, score) => sum + score, 0) / quizScores.length)
+            : 0;
+        
+        const status = getUserStatus(user);
+        const statusClass = getStatusClass(status);
+        
+        return `
+            <tr>
+                <td><strong>${name}</strong></td>
+                <td>${formatDate(user.loginTime)}</td>
+                <td>${formatDate(user.lastLogin)}</td>
+                <td>
+                    <div class="progress-circle" style="background: conic-gradient(var(--primary-red) ${progress * 3.6}deg, var(--border-light) ${progress * 3.6}deg)">
+                        ${progress}%
+                    </div>
+                </td>
+                <td>${user.videosWatched || 0}/10</td>
+                <td>${avgQuiz}%</td>
+                <td>${formatTime(user.timeSpent || 0)}</td>
+                <td><span class="status-indicator ${statusClass}">${status}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn view" onclick="viewUserDetails('${name}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn reset" onclick="resetUserProgress('${name}')">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateFeedbackTable() {
+    const tbody = document.getElementById('feedbackTableBody');
+    const countElement = document.getElementById('feedbackCount');
+    
+    if (!tbody || !countElement) return;
+    
+    const feedback = adminData.feedback || [];
+    countElement.textContent = `${feedback.length} feedback submissions`;
+    
+    tbody.innerHTML = feedback.map((item, index) => `
+        <tr>
+            <td><strong>${item.name}</strong></td>
+            <td>${formatDate(item.timestamp)}</td>
+            <td>${renderStars(item.ratings.overall)}</td>
+            <td>${renderStars(item.ratings.content)}</td>
+            <td>${item.helpfulContent || 'Not specified'}</td>
+            <td>
+                <div class="comment-preview" onclick="viewFeedbackDetails(${index})">
+                    ${truncateText(item.comments, 50)}
+                </div>
+            </td>
+            <td>
+                <button class="action-btn view" onclick="viewFeedbackDetails(${index})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getUserStatus(user) {
+    if (!user.lastLogin) return 'New';
+    
+    const lastLogin = new Date(user.lastLogin);
+    const now = new Date();
+    const daysDiff = Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24));
+    
+    if (user.progress && user.progress.overall >= 90) return 'Completed';
+    if (daysDiff === 0) return 'Active';
+    if (daysDiff <= 7) return 'Recent';
+    return 'Inactive';
+}
+
+function getStatusClass(status) {
+    switch (status) {
+        case 'Active': return 'status-active';
+        case 'Completed': return 'status-completed';
+        case 'Recent': return 'status-in-progress';
+        default: return 'status-inactive';
+    }
+}
+
+function renderStars(rating) {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+        stars.push(`<span class="star ${i <= rating ? '' : 'empty'}">★</span>`);
+    }
+    return `<div class="star-display">${stars.join('')}</div>`;
+}
+
+function truncateText(text, length) {
+    return text && text.length > length ? text.substring(0, length) + '...' : text || '';
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+
+function viewUserDetails(userName) {
+    const user = adminData.users[userName];
+    if (!user) return;
+    
+    const modal = document.getElementById('userDetailModal');
+    const title = document.getElementById('userDetailTitle');
+    const body = document.getElementById('userDetailBody');
+    
+    title.textContent = `${userName} - User Details`;
+    
+    const quizScores = user.quizScores || {};
+    const completedSections = user.completedSections || [];
+    const unlockedDepartments = user.unlockedDepartments || [];
+    
+    body.innerHTML = `
+        <div class="detail-section">
+            <h4>Overview</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Overall Progress</div>
+                    <div class="detail-value">${user.progress ? user.progress.overall : 0}%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Videos Watched</div>
+                    <div class="detail-value">${user.videosWatched || 0}/10</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Time Spent</div>
+                    <div class="detail-value">${formatTime(user.timeSpent || 0)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">${getUserStatus(user)}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h4>Quiz Scores</h4>
+            <div class="quiz-scores-grid">
+                ${Object.entries(quizScores).map(([dept, score]) => `
+                    <div class="quiz-score-item">
+                        <span>${formatDepartmentName(dept)}</span>
+                        <span><strong>${score}%</strong></span>
+                    </div>
+                `).join('') || '<p>No quiz attempts yet</p>'}
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h4>Progress Details</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Completed Sections</div>
+                    <div class="detail-value">${completedSections.length}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Unlocked Departments</div>
+                    <div class="detail-value">${unlockedDepartments.length}/9</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">First Login</div>
+                    <div class="detail-value">${formatDate(user.loginTime)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Last Login</div>
+                    <div class="detail-value">${formatDate(user.lastLogin)}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+function viewFeedbackDetails(index) {
+    const feedback = adminData.feedback[index];
+    if (!feedback) return;
+    
+    const modal = document.getElementById('feedbackDetailModal');
+    const title = document.getElementById('feedbackDetailTitle');
+    const body = document.getElementById('feedbackDetailBody');
+    
+    title.textContent = `Feedback from ${feedback.name}`;
+    
+    body.innerHTML = `
+        <div class="detail-section">
+            <h4>Ratings</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Overall Experience</div>
+                    <div class="detail-value">${renderStars(feedback.ratings.overall)} (${feedback.ratings.overall}/5)</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Content Quality</div>
+                    <div class="detail-value">${renderStars(feedback.ratings.content)} (${feedback.ratings.content}/5)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h4>Feedback Details</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${feedback.email || 'Not provided'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Most Helpful Content</div>
+                    <div class="detail-value">${feedback.helpfulContent || 'Not specified'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Submission Date</div>
+                    <div class="detail-value">${formatDate(feedback.timestamp)}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h4>Comments</h4>
+            <div class="feedback-detail-content">
+                <p><strong>General Comments:</strong></p>
+                <p>${feedback.comments || 'No comments provided'}</p>
+                
+                <p><strong>Improvement Suggestions:</strong></p>
+                <p>${feedback.improvements || 'No suggestions provided'}</p>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeUserDetailModal() {
+    document.getElementById('userDetailModal').classList.add('hidden');
+}
+
+function closeFeedbackDetailModal() {
+    document.getElementById('feedbackDetailModal').classList.add('hidden');
+}
+
+function formatDepartmentName(deptId) {
+    const names = {
+        'company-overview': 'Company Overview',
+        'human-resources': 'Human Resources',
+        'manufacturing': 'Manufacturing',
+        'supply-chain': 'Supply Chain',
+        'commercial': 'Commercial',
+        'finance': 'Finance',
+        'engineering': 'Engineering',
+        'corporate-affairs': 'Corporate Affairs',
+        'risk-compliance': 'Risk & Compliance',
+        'it-business-technology': 'IT/Technology'
+    };
+    return names[deptId] || deptId;
+}
+
+function refreshAdminData() {
+    updateAdminDashboard();
+    showCompletionPopup('success', 'Data Refreshed', 'All admin data has been refreshed successfully.');
+}
+
+// Enhanced export function
+function exportUserData() {
+    if (!isAdmin) return;
+    
+    const exportData = {
+        exportDate: new Date().toISOString(),
+        totalUsers: Object.keys(adminData.users).length,
+        totalFeedback: adminData.feedback.length,
+        users: adminData.users,
+        feedback: adminData.feedback,
+        summary: {
+            completedUsers: Object.values(adminData.users).filter(u => u.progress && u.progress.overall >= 90).length,
+            averageProgress: Math.round(
+                Object.values(adminData.users).reduce((sum, u) => sum + (u.progress ? u.progress.overall : 0), 0) / 
+                Object.keys(adminData.users).length
+            ),
+            totalTimeSpent: Object.values(adminData.users).reduce((sum, u) => sum + (u.timeSpent || 0), 0)
+        }
+    };
+    
+    // Create downloadable file
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `uac-onboarding-data-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    showCompletionPopup('success', 'Export Complete', 'User data has been exported successfully.');
+}
+
+
+</script>
+</body>
+</html>
